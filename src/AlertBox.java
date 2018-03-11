@@ -1,18 +1,3 @@
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-
-
-import javafx.scene.control.Label;
-import javafx.stage.*;
-import javafx.scene.*;
-import javafx.scene.layout.*;
-import javafx.scene.control.*;
-import javafx.geometry.*;
-
 /**
  * Created by kno on 05.03.2018.
  */
