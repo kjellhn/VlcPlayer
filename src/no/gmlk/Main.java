@@ -52,7 +52,7 @@ public final class Main extends Application {
         final Button opnbtn7 = new Button("Skjerm 7");
         final Button opnbtn8 = new Button("Skjerm 8");
         final Label lbl1 = new Label("");
-        final Label lbl2 = new Label("test");
+        final Label lbl2 = new Label("");
         final Label lbl3 = new Label("");
         final Label lbl4 = new Label("");
         final Label lbl5 = new Label("");
@@ -61,7 +61,7 @@ public final class Main extends Application {
 
         opnbtn1.setOnAction(
                 event -> {
-                  configureFileChooser(fileChooser);
+//                  configureFileChooser(fileChooser);
                   handle(opnbtn1,fileChooser);
                   lbl1.setText(fileName);
                 });
@@ -119,7 +119,7 @@ public final class Main extends Application {
         fileChooser.setInitialDirectory(
                 new File(System.getProperty("user.home")));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Film", "*.mkv", "*.mp4", "*.MOV"));
+                new FileChooser.ExtensionFilter("Film", "*.mkv", "*.mp4", "*.MOV", "*.docx"));
 
 
     }
