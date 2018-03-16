@@ -1,3 +1,5 @@
+package no.gmlk;
+
 /**
  * Created by kno on 05.03.2018.
  */
