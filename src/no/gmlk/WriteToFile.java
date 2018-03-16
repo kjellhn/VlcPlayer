@@ -1,5 +1,7 @@
 package no.gmlk;
 
+import javafx.application.Application;
+
 import java.io.*;
 
 /**
@@ -17,20 +19,13 @@ public class WriteToFile {
     private static String numScreen = "1";
 
 
-    public void main(String[] args) throws IOException, InterruptedException {
 
-
-        writeToFile();
-
-        runVlc();
-    }
-
-    public static void writeToFile() throws IOException {
+    public  static void sendToFile(String path) throws IOException {
         String newLine = System.lineSeparator();
         PrintWriter out = null;
         try {
             out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_NAME)));
-            out.print(START_VLC + pathToMovie + VLC_COMMANDS + numScreen + newLine);
+            out.append(START_VLC + pathToMovie + VLC_COMMANDS + numScreen + newLine);
 
         } finally {
             if (out != null) {
