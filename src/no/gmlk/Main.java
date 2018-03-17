@@ -158,8 +158,6 @@ public final class Main extends Application {
 
         window.setScene(new Scene(rootGroup));
         window.show();
-
-
     }
 
     private void closeProgram() {
