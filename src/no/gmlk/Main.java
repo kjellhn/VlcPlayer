@@ -14,6 +14,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ public final class Main extends Application {
     MenuBar menuBar = new MenuBar();
 
     final Button start = new Button("Start");
+    final Label startLabel = new Label("");
     final Button opnbtn1 = new Button("Skjerm 1");
     final Button opnbtn2 = new Button("Skjerm 2");
     final Button opnbtn3 = new Button("Skjerm 3");
@@ -89,6 +91,7 @@ public final class Main extends Application {
         openMenuItem.setOnAction(event -> {
             openFile(openMenuItem, fileChooser);
             readFromFile(filePath);
+            startLabel.setText(filePath);
         });
         MenuItem saveMenuItem = new MenuItem("Save");
         MenuItem exitMenuItem = new MenuItem("Exit");
@@ -126,6 +129,7 @@ public final class Main extends Application {
         GridPane.setConstraints(opnbtn7, 0, 6);
         GridPane.setConstraints(opnbtn8, 0, 7);
         GridPane.setConstraints(start, 0, 8);
+        GridPane.setConstraints(startLabel, 0, 9);
         GridPane.setConstraints(lbl1, 1, 0);
         GridPane.setConstraints(lbl2, 1, 1);
         GridPane.setConstraints(lbl3, 1, 2);
@@ -147,6 +151,7 @@ public final class Main extends Application {
 
         inputGridPane.getChildren().addAll(
                 start,
+                startLabel,
                 opnbtn1, opnbtn2, opnbtn3, opnbtn4, opnbtn5, opnbtn6, opnbtn7, opnbtn8,
                 lbl1, lbl2, lbl3, lbl4, lbl5, lbl6, lbl7, lbl8,
                 remove1, remove2, remove3, remove4, remove5, remove6, remove7, remove8);
@@ -414,27 +419,25 @@ public final class Main extends Application {
     public static void readFromFile(String filePath) {
         StringBuilder sb = new StringBuilder();
         List<String> fileList = new ArrayList<>();
-        String strLine = "";
+        String strLine = null;
         try {
-            BufferedReader br = new BufferedReader(new FileReader(filePath));
-            while (strLine != null)
-            {
-                strLine = br.readLine();
-                sb.append(strLine);
-                sb.append(System.lineSeparator());
-                strLine = br.readLine();
-                if (strLine==null)
-                    break;
+            // FileReader reads text files in the default encoding.
+            FileReader fileReader = new FileReader(filePath);
+
+            // Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while((strLine = bufferedReader.readLine()) != null) {
+                System.out.println(strLine);
                 fileList.add(strLine);
-                sendToFile(fileList);
             }
+            bufferedReader.close();
+            sendToFile(fileList);
+
         } catch (FileNotFoundException fnf) {
             System.err.println("Fant ikke fil");
         }catch (IOException ioe){
             System.err.println("Kan ikke lese filen");
         }
-
-
     }
 }
 
