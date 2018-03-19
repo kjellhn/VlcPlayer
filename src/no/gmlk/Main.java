@@ -2,6 +2,7 @@ package no.gmlk;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -89,7 +90,7 @@ public final class Main extends Application {
         Menu fileMenu = new Menu("File");
         MenuItem openMenuItem = new MenuItem("Åpne");
         openMenuItem.setOnAction(event -> {
-            openFile(openMenuItem, fileChooser);
+            openBatFile(openMenuItem, fileChooser);
             readFromFile(filePath);
             startLabel.setText(filePath);
         });
@@ -163,32 +164,13 @@ public final class Main extends Application {
         window.setScene(new Scene(rootGroup));
         window.show();
 
-        start.setOnAction(
-                event -> {
-                    buildFile();
-                    try {
-                        sendToFile(list);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        runVlc();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
-
         opnbtn1.setOnAction(
                 e -> {
-
                     handle(opnbtn1, fileChooser);
                     lbl1.setText(filePath);
                     lbl1.setId("1");
                     remove1.setVisible(true);
                 });
-
         opnbtn2.setOnAction(
                 e -> {
                     handle(opnbtn2, fileChooser);
@@ -196,27 +178,21 @@ public final class Main extends Application {
                     lbl2.setText(filePath);
                     lbl2.setId("2");
                     remove2.setVisible(true);
-
                 });
-
         opnbtn3.setOnAction(
                 event -> {
                     handle(opnbtn3, fileChooser);
                     lbl3.setText(filePath);
                     lbl3.setId("3");
                     remove3.setVisible(true);
-
                 });
-
         opnbtn4.setOnAction(
                 e -> {
                     handle(opnbtn4, fileChooser);
                     lbl4.setText(filePath);
                     lbl4.setId("4");
                     remove4.setVisible(true);
-
                 });
-
         opnbtn5.setOnAction(
                 e -> {
                     handle(opnbtn5, fileChooser);
@@ -224,7 +200,6 @@ public final class Main extends Application {
                     lbl4.setId("5");
                     remove2.setVisible(true);
                 });
-
         opnbtn6.setOnAction(
                 e -> {
                     handle(opnbtn6, fileChooser);
@@ -232,7 +207,6 @@ public final class Main extends Application {
                     lbl4.setId("6");
                     remove6.setVisible(true);
                 });
-
         opnbtn7.setOnAction(
                 e -> {
                     handle(opnbtn7, fileChooser);
@@ -240,7 +214,6 @@ public final class Main extends Application {
                     lbl4.setId("7");
                     remove7.setVisible(true);
                 });
-
         opnbtn8.setOnAction(
                 e -> {
                     handle(opnbtn8, fileChooser);
@@ -248,7 +221,6 @@ public final class Main extends Application {
                     lbl4.setId("8");
                     remove8.setVisible(true);
                 });
-
         remove1.setOnAction(
                 event -> {
                     lbl1.setText("");
@@ -298,7 +270,6 @@ public final class Main extends Application {
                     remove8.setVisible(false);
                 });
 
-
 //        btnClose = new Button("Lukk programmet");
 //        btnClose.setAlignment(Pos.BOTTOM_RIGHT);
 //        btnClose.setOnAction(event -> closeProgram());
@@ -317,8 +288,9 @@ public final class Main extends Application {
         fileChooser.setTitle("Velg en film");
         fileChooser.setInitialDirectory(
                 new File(System.getProperty("user.home")));
-        fileChooser.getExtensionFilters().addAll(
+        fileChooser.getExtensionFilters().setAll(
                 new FileChooser.ExtensionFilter("Film", "*.mkv", "*.mp4", "*.MOV"));
+
 
 
     }
@@ -328,13 +300,12 @@ public final class Main extends Application {
         fileChooser.setTitle("Velg fil");
         fileChooser.setInitialDirectory(
                 new File(System.getProperty("user.home")));
-        fileChooser.getExtensionFilters().addAll(
+        fileChooser.getExtensionFilters().setAll(
                 new FileChooser.ExtensionFilter(".bat", "*.bat"));
 
 
     }
-
-    public String openFile(MenuItem menuItem, final FileChooser fileChooser) {
+    private String openBatFile(MenuItem menuItem, final FileChooser fileChooser) {
         configureBatFileChooser(fileChooser);
         File file = fileChooser.showOpenDialog(window);
         if (file != null) {
@@ -344,7 +315,8 @@ public final class Main extends Application {
         return filePath;
     }
 
-    public String handle(Button button, final FileChooser fileChooser) {
+
+    private String handle(Button button, final FileChooser fileChooser) {
         configureMovieFileChooser(fileChooser);
         File file = fileChooser.showOpenDialog(window);
         if (file != null) {
@@ -354,7 +326,7 @@ public final class Main extends Application {
         return filePath;
     }
 
-    public void buildFile() {
+    private void buildFile() {
 
         if (!list.isEmpty())
             list.clear();
@@ -383,7 +355,7 @@ public final class Main extends Application {
 
     }
 
-    public static void sendToFile(List list) throws IOException {
+    private static void sendToFile(List list) throws IOException {
 
         PrintWriter out = null;
         try {
@@ -402,7 +374,7 @@ public final class Main extends Application {
         }
     }
 
-    public static void runVlc() throws IOException, InterruptedException {
+    private static void runVlc() throws IOException, InterruptedException {
 //        PrintWriter out = new PrintWriter("test.bat");
 //        FileOutputStream outputStream = new FileOutputStream("");
 
@@ -416,7 +388,7 @@ public final class Main extends Application {
         }
     }
 
-    public static void readFromFile(String filePath) {
+    private static void readFromFile(String filePath) {
         StringBuilder sb = new StringBuilder();
         List<String> fileList = new ArrayList<>();
         String strLine = null;
@@ -425,12 +397,12 @@ public final class Main extends Application {
             FileReader fileReader = new FileReader(filePath);
 
             // Always wrap FileReader in BufferedReader.
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while((strLine = bufferedReader.readLine()) != null) {
-                System.out.println(strLine);
-                fileList.add(strLine);
+            try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+                while ((strLine = bufferedReader.readLine()) != null) {
+                    System.out.println(strLine);
+                    fileList.add(strLine);
+                }
             }
-            bufferedReader.close();
             sendToFile(fileList);
 
         } catch (FileNotFoundException fnf) {
@@ -439,6 +411,20 @@ public final class Main extends Application {
             System.err.println("Kan ikke lese filen");
         }
     }
+
+//    private void getBat(ActionEvent event) throws InterruptedException {
+//        buildFile();
+//        try {
+//            sendToFile(list);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            runVlc();
+//        } catch (IOException e) {
+//            System.err.println(e);;
+//        }
+//    }
 }
 
 
