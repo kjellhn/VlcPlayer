@@ -3,31 +3,21 @@ package no.gmlk;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.awt.*;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-
-import static javafx.scene.paint.Color.DEEPPINK;
 
 
 public final class Main extends Application {
@@ -35,49 +25,51 @@ public final class Main extends Application {
     Stage window;
     Button btnClose;
     String filePath;
-    String path;
-    String screenNumber;
+    String fileName;
+
     private static final String FILE_NAME = "src/resources/test.bat";
     private static final String START_VLC = "start VLC ";
     private static final String VLC_COMMANDS = " --fullscreen --loop --video-on-top --no-video-deco --no-spu --qt-fullscreen-screennumber= ";
     private static final String APP_NAME = "VLC";
+    private static final String USER_HOME = "user.home";
 
     final FileChooser fileChooser = new FileChooser();
     final ProcessBuilder processBuilder = new ProcessBuilder();
     private ArrayList list = new ArrayList();
-    long pin = 0;
 
 
     final Menu menu = new Menu("Options");
     MenuBar menuBar = new MenuBar();
 
-    final Button start = new Button("Start");
-    final Label startLabel = new Label("");
-    final Button opnbtn1 = new Button("Skjerm 1");
-    final Button opnbtn2 = new Button("Skjerm 2");
-    final Button opnbtn3 = new Button("Skjerm 3");
-    final Button opnbtn4 = new Button("Skjerm 4");
-    final Button opnbtn5 = new Button("Skjerm 5");
-    final Button opnbtn6 = new Button("Skjerm 6");
-    final Button opnbtn7 = new Button("Skjerm 7");
-    final Button opnbtn8 = new Button("Skjerm 8");
-    final Label lbl1 = new Label("");
-    final Label lbl2 = new Label("");
-    final Label lbl3 = new Label("");
-    final Label lbl4 = new Label("");
-    final Label lbl5 = new Label("");
-    final Label lbl6 = new Label("");
-    final Label lbl7 = new Label("");
-    final Label lbl8 = new Label("");
-    final Button remove1 = new Button("Slett");
-    final Button remove2 = new Button("Slett");
-    final Button remove3 = new Button("Slett");
-    final Button remove4 = new Button("Slett");
-    final Button remove5 = new Button("Slett");
-    final Button remove6 = new Button("Slett");
-    final Button remove7 = new Button("Slett");
-    final Button remove8 = new Button("Slett");
-    final Button closeVlc = new Button("Lukk VLC");
+    private final Button start = new Button("Start");
+    private final Label startLabel = new Label("");
+    private final Button opnbtn1 = new Button("Skjerm 1");
+    private final Button opnbtn2 = new Button("Skjerm 2");
+    private final Button opnbtn3 = new Button("Skjerm 3");
+    private final Button opnbtn4 = new Button("Skjerm 4");
+    private final Button opnbtn5 = new Button("Skjerm 5");
+    private final Button opnbtn6 = new Button("Skjerm 6");
+    private final Button opnbtn7 = new Button("Skjerm 7");
+    private final Button opnbtn8 = new Button("Skjerm 8");
+    private final Label lbl1 = new Label("");
+    private final Label lbl2 = new Label("");
+    private final Label lbl3 = new Label("");
+    private final Label lbl4 = new Label("");
+    private final Label lbl5 = new Label("");
+    private final Label lbl6 = new Label("");
+    private final Label lbl7 = new Label("");
+    private final Label lbl8 = new Label("");
+    private final Button remove1 = new Button("Fjern");
+    private final Button remove2 = new Button("Fjern");
+    private final Button remove3 = new Button("Fjern");
+    private final Button remove4 = new Button("Slett");
+    private final Button remove5 = new Button("Fjern");
+    private final Button remove6 = new Button("Fjern");
+    private final Button remove7 = new Button("Fjern");
+    private final Button remove8 = new Button("Fjern");
+    private final Button closeVlc = new Button("Lukk VLC");
+    private final Button closeProgram = new Button("Lukk Programmet");
+    private Stage stage = window;
 
 
     public static void main(String[] args) {
@@ -104,8 +96,17 @@ public final class Main extends Application {
             startLabel.setText(filePath);
         });
         MenuItem saveMenuItem = new MenuItem("Save");
+        saveMenuItem.setOnAction(event -> {
+            buildFile();
+            try {
+                handleSave(fileChooser);
+            } catch (IOException e) {
+                System.err.println(e);
+            }
+        });
+
         MenuItem exitMenuItem = new MenuItem("Exit");
-        exitMenuItem.setOnAction(actionEvent -> Platform.exit());
+        exitMenuItem.setOnAction(event -> closeProgram());
         fileMenu.getItems().addAll(openMenuItem, saveMenuItem,
                 new SeparatorMenuItem(), exitMenuItem);
         menuBar.getMenus().addAll(fileMenu);
@@ -156,7 +157,10 @@ public final class Main extends Application {
         GridPane.setConstraints(remove6, 2, 5);
         GridPane.setConstraints(remove7, 2, 6);
         GridPane.setConstraints(remove8, 2, 7);
-        GridPane.setConstraints(closeVlc,3,8);
+        GridPane.setConstraints(closeVlc, 3, 8);
+        GridPane.setConstraints(closeProgram, 5,8);
+
+
         gridPane.setHgap(10);
         gridPane.setVgap(10);
 
@@ -166,7 +170,7 @@ public final class Main extends Application {
                 opnbtn1, opnbtn2, opnbtn3, opnbtn4, opnbtn5, opnbtn6, opnbtn7, opnbtn8,
                 lbl1, lbl2, lbl3, lbl4, lbl5, lbl6, lbl7, lbl8,
                 remove1, remove2, remove3, remove4, remove5, remove6, remove7, remove8,
-                closeVlc);
+                closeVlc, closeProgram);
 
         BorderPane borderPane = new BorderPane();
         menuBar.prefWidthProperty().bind(stage.widthProperty());
@@ -174,7 +178,6 @@ public final class Main extends Application {
 
         final Pane rootGroup = new VBox(10);
         rootGroup.getChildren().addAll(menuBar, gridPane);
-        //        Scene scene = new Scene(borderPane, 300, 250, Color.WHITE);
         rootGroup.setPadding(new Insets(12, 12, 12, 12));
         rootGroup.setMinHeight(300);
         rootGroup.setMinWidth(800);
@@ -182,7 +185,7 @@ public final class Main extends Application {
         window.setScene(new Scene(rootGroup));
         window.show();
         start.setOnAction(
-                e -> {
+                event -> {
                     buildFile();
                     try {
                         sendToFile(list);
@@ -196,18 +199,20 @@ public final class Main extends Application {
                     }
                 });
         opnbtn1.setOnAction(
-                e -> {
+                event -> {
                     handle(opnbtn1, fileChooser);
                     lbl1.setText(filePath);
                     lbl1.setId("1");
+                    if (lbl1.getText() != null)
                     remove1.setVisible(true);
                 });
         opnbtn2.setOnAction(
-                e -> {
+                event -> {
                     handle(opnbtn2, fileChooser);
                     System.out.println(filePath);
                     lbl2.setText(filePath);
                     lbl2.setId("2");
+                    if (lbl2.getText() != null)
                     remove2.setVisible(true);
                 });
         opnbtn3.setOnAction(
@@ -215,41 +220,47 @@ public final class Main extends Application {
                     handle(opnbtn3, fileChooser);
                     lbl3.setText(filePath);
                     lbl3.setId("3");
+                    if (lbl3.getText() != null)
                     remove3.setVisible(true);
                 });
         opnbtn4.setOnAction(
-                e -> {
+                event -> {
                     handle(opnbtn4, fileChooser);
                     lbl4.setText(filePath);
                     lbl4.setId("4");
+                    if (lbl4.getText() != null)
                     remove4.setVisible(true);
                 });
         opnbtn5.setOnAction(
-                e -> {
+                event -> {
                     handle(opnbtn5, fileChooser);
                     lbl5.setText(filePath);
                     lbl4.setId("5");
-                    remove2.setVisible(true);
+                    if (lbl5.getText() != null)
+                    remove5.setVisible(true);
                 });
         opnbtn6.setOnAction(
-                e -> {
+                event -> {
                     handle(opnbtn6, fileChooser);
                     lbl6.setText(filePath);
                     lbl4.setId("6");
+                    if (lbl6.getText() != null)
                     remove6.setVisible(true);
                 });
         opnbtn7.setOnAction(
-                e -> {
+                event -> {
                     handle(opnbtn7, fileChooser);
                     lbl7.setText(filePath);
-                    lbl4.setId("7");
+                    lbl7.setId("7");
+                    if (lbl7.getText() != null)
                     remove7.setVisible(true);
                 });
         opnbtn8.setOnAction(
-                e -> {
+                event -> {
                     handle(opnbtn8, fileChooser);
                     lbl8.setText(filePath);
-                    lbl4.setId("8");
+                    lbl8.setId("8");
+                    if (lbl8.getText() != null)
                     remove8.setVisible(true);
                 });
         remove1.setOnAction(
@@ -302,14 +313,10 @@ public final class Main extends Application {
                 });
         closeVlc.setOnAction(
                 event -> {
-                    closeVlc(APP_NAME );
+                    killVlc(APP_NAME);
                 }
         );
-
-
-//        btnClose = new Button("Lukk programmet");
-//        btnClose.setAlignment(Pos.BOTTOM_RIGHT);
-//        btnClose.setOnAction(event -> closeProgram());
+        closeProgram.setOnAction(event -> closeProgram());
 
     }
 
@@ -325,11 +332,42 @@ public final class Main extends Application {
 
         fileChooser.setTitle("Velg en film");
         fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.home")));
+                new File(System.getProperty(USER_HOME)));
         fileChooser.getExtensionFilters().setAll(
                 new FileChooser.ExtensionFilter("Film", "*.mkv", "*.mp4", "*.MOV"));
 
+    }
 
+    private void handleSave(final FileChooser fileChooser) throws IOException {
+
+        fileChooser.setTitle("Lagre fil");
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.home")));
+        fileChooser.getExtensionFilters().setAll(
+                new FileChooser.ExtensionFilter("bat", "*.bat"));
+
+        File file = fileChooser.showSaveDialog(window);
+        if (file != null) {
+            buildFile();
+            saveFile(list, file);
+        }
+    }
+
+    private void saveFile(ArrayList li, File file) throws IOException {
+
+        String fileName = file.getAbsolutePath();
+        System.out.println("Filepath: " + fileName + "\n" + file.getAbsolutePath());
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(new BufferedWriter(new FileWriter(file.getAbsolutePath())));
+            out.write(formatString(String.valueOf(list)));
+        } catch (FileNotFoundException nf) {
+            System.err.println(nf);
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
     }
 
     private static void configureBatFileChooser(final FileChooser fileChooser) {
@@ -353,16 +391,17 @@ public final class Main extends Application {
             if (file != null) {
                 file.getAbsolutePath();
                 filePath = file.getAbsolutePath();
+                fileName = file.getName();
             }
         } catch (NullPointerException ne) {
             System.out.println("OpenFileNullPointerException: " + ne);
         }
     }
 
-
     private String handle(Button button, final FileChooser fileChooser) {
         configureMovieFileChooser(fileChooser);
         getFile();
+
         return filePath;
     }
 
@@ -370,9 +409,7 @@ public final class Main extends Application {
 
         if (!list.isEmpty())
             list.clear();
-
         String newLine = System.lineSeparator();
-
         if (lbl1.getId() != null)
             list.add(START_VLC + lbl1.getText() + VLC_COMMANDS + opnbtn1.getId() + newLine);
         if (lbl2.getId() != null)
@@ -389,22 +426,6 @@ public final class Main extends Application {
             list.add(START_VLC + lbl7.getText() + VLC_COMMANDS + opnbtn7.getId() + newLine);
         if (lbl8.getId() != null)
             list.add(START_VLC + lbl8.getText() + VLC_COMMANDS + opnbtn8.getId());
-
-
-        System.out.println(list);
-
-    }
-    private void SaveFile(String content, File file){
-        try {
-            FileWriter fileWriter = null;
-
-            fileWriter = new FileWriter(file);
-            fileWriter.write(content);
-            fileWriter.close();
-        } catch (IOException ex) {
-            System.err.println(ex);
-        }
-
     }
 
     private static void sendToFile(List list) throws IOException {
@@ -412,11 +433,7 @@ public final class Main extends Application {
         PrintWriter out = null;
         try {
             out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_NAME)));
-//            if (FILE_NAME.getBytes()== null){
-//                out.print("");
-//            }else
-            out.write(String.valueOf(list).replaceAll("[\\[\\]\\,]", ""));
-
+            out.write(String.valueOf(list));
         } catch (FileNotFoundException nf) {
             System.err.println(nf);
         } finally {
@@ -427,43 +444,34 @@ public final class Main extends Application {
     }
 
     public static void runVlc(ProcessBuilder processBuilder) throws InterruptedException {
-//        PrintWriter out = new PrintWriter("test.bat");
-//        FileOutputStream outputStream = new FileOutputStream("");
 
         try {
             Process p = new ProcessBuilder("src/resources/test.bat").start();
-
             p.waitFor();
             long pid = p.pid();
             System.out.println(pid);
-
-
-
         } catch (IOException ioe) {
             System.err.println(ioe.getMessage());
             //Validate the case the process is being stopped by some external situation
         }
     }
-    void closeVlc(String appName) {
+
+    private void killVlc(String appName) {
         ProcessHandle
                 .allProcesses()
                 .filter(process -> isApplication(appName, process))
                 .forEach(process ->
-                process.info().command().ifPresent(command ->
-                closeAndLog(process, command)));
+                        process.info().command().ifPresent(command ->
+                                closeAndLog(process, command)));
     }
-    void closeAndLog(ProcessHandle process, String command)
-    {
+    void closeAndLog(ProcessHandle process, String command) {
         String status = process.destroyForcibly() ? " Success!" : " Failed";
         System.out.println("Killing ... " + command + status);
     }
-    boolean isApplication(final String appName, final ProcessHandle process)
-    {
+    boolean isApplication(final String appName, final ProcessHandle process) {
         return process.info().command().filter(command ->
                 command.contains(appName)).isPresent();
     }
-
-
 
     private static void readFromFile(String filePath) {
         StringBuilder sb = new StringBuilder();
@@ -478,6 +486,7 @@ public final class Main extends Application {
                 while ((strLine = bufferedReader.readLine()) != null) {
                     System.out.println(strLine);
                     fileList.add(strLine);
+
                 }
             }
             sendToFile(fileList);
@@ -486,20 +495,11 @@ public final class Main extends Application {
             System.err.println("Fant ikke fil");
 
         }
+    }
+    private String formatString(String toFormat) {
+        String formattedString = toFormat.replaceAll("[\\[\\]\\,]", "");
 
-//    private void getBat(ActionEvent event) throws InterruptedException {
-//        buildFile();
-//        try {
-//            sendToFile(list);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            runVlc();
-//        } catch (IOException e) {
-//            System.err.println(e);;
-//        }
-//    }
+        return formattedString;
     }
 }
 
