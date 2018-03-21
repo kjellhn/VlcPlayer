@@ -1,9 +1,7 @@
 package no.gmlk;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -13,8 +11,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +22,7 @@ public final class Main extends Application {
     Button btnClose;
     String filePath;
     String fileName;
+    File batFile;
 
     private static final String FILE_NAME = "src/resources/test.bat";
     private static final String START_VLC = "start VLC ";
@@ -80,7 +77,7 @@ public final class Main extends Application {
     public void start(final Stage stage) throws Exception {
 
         window = stage;
-        window.setTitle("Gammekinoen VLC");
+        window.setTitle("JAVA OPPGAVE");
         window.setMinWidth(800);
         window.setOnCloseRequest(e -> {
             e.consume();
@@ -88,16 +85,21 @@ public final class Main extends Application {
         });
 
         // File menu - new, save, exit
-        Menu fileMenu = new Menu("File");
+        Menu fileMenu = new Menu("Fil");
         MenuItem openMenuItem = new MenuItem("Åpne");
         openMenuItem.setOnAction(event -> {
-            openBatFile(openMenuItem, fileChooser);
-            readFromFile(filePath);
+            try {
+                openBatFile(fileChooser);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
             startLabel.setText(filePath);
         });
-        MenuItem saveMenuItem = new MenuItem("Save");
+        MenuItem saveMenuItem = new MenuItem("Lagre");
         saveMenuItem.setOnAction(event -> {
-            buildFile();
+
             try {
                 handleSave(fileChooser);
             } catch (IOException e) {
@@ -158,7 +160,7 @@ public final class Main extends Application {
         GridPane.setConstraints(remove7, 2, 6);
         GridPane.setConstraints(remove8, 2, 7);
         GridPane.setConstraints(closeVlc, 3, 8);
-        GridPane.setConstraints(closeProgram, 5,8);
+        GridPane.setConstraints(closeProgram, 5, 8);
 
 
         gridPane.setHgap(10);
@@ -193,7 +195,7 @@ public final class Main extends Application {
                         System.err.println(e1);
                     }
                     try {
-                        runVlc(processBuilder);
+                        ButtonHandler.runVlc(processBuilder);
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
@@ -204,7 +206,7 @@ public final class Main extends Application {
                     lbl1.setText(filePath);
                     lbl1.setId("1");
                     if (lbl1.getText() != null)
-                    remove1.setVisible(true);
+                        remove1.setVisible(true);
                 });
         opnbtn2.setOnAction(
                 event -> {
@@ -213,7 +215,7 @@ public final class Main extends Application {
                     lbl2.setText(filePath);
                     lbl2.setId("2");
                     if (lbl2.getText() != null)
-                    remove2.setVisible(true);
+                        remove2.setVisible(true);
                 });
         opnbtn3.setOnAction(
                 event -> {
@@ -221,7 +223,7 @@ public final class Main extends Application {
                     lbl3.setText(filePath);
                     lbl3.setId("3");
                     if (lbl3.getText() != null)
-                    remove3.setVisible(true);
+                        remove3.setVisible(true);
                 });
         opnbtn4.setOnAction(
                 event -> {
@@ -229,7 +231,7 @@ public final class Main extends Application {
                     lbl4.setText(filePath);
                     lbl4.setId("4");
                     if (lbl4.getText() != null)
-                    remove4.setVisible(true);
+                        remove4.setVisible(true);
                 });
         opnbtn5.setOnAction(
                 event -> {
@@ -237,7 +239,7 @@ public final class Main extends Application {
                     lbl5.setText(filePath);
                     lbl4.setId("5");
                     if (lbl5.getText() != null)
-                    remove5.setVisible(true);
+                        remove5.setVisible(true);
                 });
         opnbtn6.setOnAction(
                 event -> {
@@ -245,7 +247,7 @@ public final class Main extends Application {
                     lbl6.setText(filePath);
                     lbl4.setId("6");
                     if (lbl6.getText() != null)
-                    remove6.setVisible(true);
+                        remove6.setVisible(true);
                 });
         opnbtn7.setOnAction(
                 event -> {
@@ -253,7 +255,7 @@ public final class Main extends Application {
                     lbl7.setText(filePath);
                     lbl7.setId("7");
                     if (lbl7.getText() != null)
-                    remove7.setVisible(true);
+                        remove7.setVisible(true);
                 });
         opnbtn8.setOnAction(
                 event -> {
@@ -261,7 +263,7 @@ public final class Main extends Application {
                     lbl8.setText(filePath);
                     lbl8.setId("8");
                     if (lbl8.getText() != null)
-                    remove8.setVisible(true);
+                        remove8.setVisible(true);
                 });
         remove1.setOnAction(
                 event -> {
@@ -313,20 +315,13 @@ public final class Main extends Application {
                 });
         closeVlc.setOnAction(
                 event -> {
-                    killVlc(APP_NAME);
+                    ButtonHandler.killVlc(APP_NAME);
                 }
         );
         closeProgram.setOnAction(event -> closeProgram());
 
     }
 
-    private void closeProgram() {
-        Boolean answer = ConfirmBox.display("Avslutt", "Vil du avslutte?");
-        if (answer) {
-            window.close();
-            System.out.println("Programmet er lukket");
-        }
-    }
 
     private static void configureMovieFileChooser(final FileChooser fileChooser) {
 
@@ -356,7 +351,7 @@ public final class Main extends Application {
     private void saveFile(ArrayList li, File file) throws IOException {
 
         String fileName = file.getAbsolutePath();
-        System.out.println("Filepath: " + fileName + "\n" + file.getAbsolutePath());
+
         PrintWriter out = null;
         try {
             out = new PrintWriter(new BufferedWriter(new FileWriter(file.getAbsolutePath())));
@@ -379,10 +374,11 @@ public final class Main extends Application {
                 new FileChooser.ExtensionFilter(".bat", "*.bat"));
     }
 
-    private String openBatFile(MenuItem menuItem, final FileChooser fileChooser) {
+    private void openBatFile(final FileChooser fileChooser) throws IOException {
         configureBatFileChooser(fileChooser);
-        getFile();
-        return filePath;
+        getBatFile();
+
+
     }
 
     public void getFile() {
@@ -443,38 +439,39 @@ public final class Main extends Application {
         }
     }
 
-    public static void runVlc(ProcessBuilder processBuilder) throws InterruptedException {
 
-        try {
-            Process p = new ProcessBuilder("src/resources/test.bat").start();
-            p.waitFor();
-            long pid = p.pid();
-            System.out.println(pid);
-        } catch (IOException ioe) {
-            System.err.println(ioe.getMessage());
-            //Validate the case the process is being stopped by some external situation
-        }
-    }
-
-    private void killVlc(String appName) {
-        ProcessHandle
-                .allProcesses()
-                .filter(process -> isApplication(appName, process))
-                .forEach(process ->
-                        process.info().command().ifPresent(command ->
-                                closeAndLog(process, command)));
-    }
-    void closeAndLog(ProcessHandle process, String command) {
-        String status = process.destroyForcibly() ? " Success!" : " Failed";
-        System.out.println("Killing ... " + command + status);
-    }
-    boolean isApplication(final String appName, final ProcessHandle process) {
-        return process.info().command().filter(command ->
-                command.contains(appName)).isPresent();
-    }
+//    public static void runVlc(ProcessBuilder processBuilder) throws InterruptedException {
+//
+//        try {
+//            Process p = new ProcessBuilder("src/resources/test.bat").start();
+//            p.waitFor();
+//            long pid = p.pid();
+//            System.out.println(pid);
+//        } catch (IOException ioe) {
+//            System.err.println(ioe.getMessage());
+//            //Validate the case the process is being stopped by some external situation
+//        }
+//    }
+//
+//    private void killVlc(String appName) {
+//        ProcessHandle
+//                .allProcesses()
+//                .filter(process -> isApplication(appName, process))
+//                .forEach(process ->
+//                        process.info().command().ifPresent(command ->
+//                                closeAndLog(process, command)));
+//    }
+//    void closeAndLog(ProcessHandle process, String command) {
+//        String status = process.destroyForcibly() ? " Success!" : " Failed";
+//        System.out.println("Killing ... " + command + status);
+//    }
+//    boolean isApplication(final String appName, final ProcessHandle process) {
+//        return process.info().command().filter(command ->
+//                command.contains(appName)).isPresent();
+//    }
 
     private static void readFromFile(String filePath) {
-        StringBuilder sb = new StringBuilder();
+//        StringBuilder sb = new StringBuilder();
         List<String> fileList = new ArrayList<>();
         String strLine = null;
         try {
@@ -485,7 +482,7 @@ public final class Main extends Application {
             try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
                 while ((strLine = bufferedReader.readLine()) != null) {
                     System.out.println(strLine);
-                    fileList.add(strLine);
+                    fileList.add(strLine + "\n");
 
                 }
             }
@@ -496,12 +493,59 @@ public final class Main extends Application {
 
         }
     }
+
     private String formatString(String toFormat) {
         String formattedString = toFormat.replaceAll("[\\[\\]\\,]", "");
 
         return formattedString;
     }
+
+    public void closeProgram() {
+        Boolean answer = ConfirmBox.display("Avslutt", "Vil du avslutte?");
+        if (answer) {
+            window.close();
+            System.out.println("Programmet er lukket");
+        }
+    }
+
+    public void getBatFile() throws IOException {
+        List<String> batList = new ArrayList<>();
+        String str = null;
+        batFile = fileChooser.showOpenDialog(window);
+        filePath = batFile.getAbsolutePath();
+
+        try (FileReader fileReader = new FileReader(filePath)) {
+
+            try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+                while ((str = bufferedReader.readLine()) != null) {
+                    batList.add(str+ "\n");
+                }
+            }
+        }
+                PrintWriter out = null;
+                try {
+                    out = new PrintWriter(new BufferedWriter(new FileWriter(FILE_NAME)));
+                    out.write(formatString(String.valueOf(batList)));
+                    System.out.println("Done");
+
+                } finally {
+                    if (out != null) {
+                        out.close();
+                    }
+            }
+            }
+
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
